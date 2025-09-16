@@ -27,7 +27,15 @@ export default function Home() {
   const [loadingStep, setLoadingStep] = useState<LoadingStep>('idle')
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [planDetails, setPlanDetails] = useState<any>(null)
+  const [planDetails, setPlanDetails] = useState<{
+    planNumber: string
+    cityText: string
+    mahut: string
+    status: string
+    statusDate: string
+    block: number
+    parcel: number
+  } | null>(null)
 
   const handleSearch = async () => {
     if (!address.trim()) {
@@ -125,7 +133,7 @@ export default function Home() {
         return new Date(0)
       }
 
-      const sortedPlans = plansData.plansSmall.sort((a: any, b: any) => {
+      const sortedPlans = plansData.plansSmall.sort((a: { statusDate: string }, b: { statusDate: string }) => {
         const dateA = parseDate(a.statusDate)
         const dateB = parseDate(b.statusDate)
         return dateB.getTime() - dateA.getTime()

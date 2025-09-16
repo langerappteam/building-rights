@@ -23,7 +23,11 @@ interface PlanSearchResult {
       info: string
       codeMismach: number
     }
-    [key: string]: any
+    [key: string]: {
+      path: string
+      info: string
+      codeMismach: number
+    } | undefined
   }
 }
 
@@ -203,7 +207,7 @@ export async function POST(request: NextRequest) {
       } else {
         throw new Error('No valid JSON found in response')
       }
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse Gemini response:', text)
       return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 })
     }
@@ -230,7 +234,7 @@ export async function POST(request: NextRequest) {
     XLSX.utils.book_append_sheet(workbook, summarySheet, 'סיכום')
 
     if (tablesData.tables && tablesData.tables.length > 0) {
-      tablesData.tables.forEach((table: any, index: number) => {
+      tablesData.tables.forEach((table: { title?: string; headers?: string[]; rows?: string[][] }, index: number) => {
         const worksheetData = []
 
         if (table.title) {
@@ -243,7 +247,7 @@ export async function POST(request: NextRequest) {
         }
 
         if (table.rows && table.rows.length > 0) {
-          table.rows.forEach((row: any[]) => {
+          table.rows.forEach((row: string[]) => {
             worksheetData.push(row)
           })
         }
@@ -252,7 +256,7 @@ export async function POST(request: NextRequest) {
 
         const maxCols = Math.max(
           table.headers?.length || 0,
-          ...((table.rows || []).map((row: any[]) => row.length))
+          ...((table.rows || []).map((row: string[]) => row.length))
         )
         const colWidths = Array(maxCols).fill({ wch: 15 })
         worksheet['!cols'] = colWidths
